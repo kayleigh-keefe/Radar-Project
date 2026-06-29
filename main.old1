@@ -1,0 +1,22 @@
+#include <stdint.h>
+#include "xmc_gpio.h"
+
+/* 1. Define the Stack Pointer (End of SRAM for XMC4700) */
+extern uint32_t __StackTop; 
+
+/* 2. Create a minimal Vector Table that the CPU can actually read */
+__attribute__ ((section(".vectors")))
+const void *vector_table[] = {
+    (void *)0x2003FFFF,     /* Initial Stack Pointer (Top of RAM) */
+    (void *)main,           /* Reset Handler: Jump straight to main */
+};
+
+int main(void) {
+    /* Standard XMC GPIO setup */
+    XMC_GPIO_SetMode(P5_9, XMC_GPIO_MODE_OUTPUT_PUSH_PULL);
+    
+    while(1) {
+        XMC_GPIO_ToggleOutput(P5_9);
+        for(volatile uint32_t i = 0; i < 1000000; i++); 
+    }
+}
